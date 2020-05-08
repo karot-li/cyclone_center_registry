@@ -23,13 +23,14 @@ public class InstanceServiceRegistryDo implements ServiceRegistry {
         Map<String, Leaser<RegisteredInstanceInfo>> serverInstance = registers.get(registeredInstanceInfo.getHostname());
         if (serverInstance == null) {
             serverInstance = new HashMap<>();
-            Leaser<RegisteredInstanceInfo> leaser = new Leaser<>();
-            registeredInstanceInfo.setStatusCode(StatusCode.UP);
-            leaser.setObj(registeredInstanceInfo);
-            leaser.setTimeCycle(registeredInstanceInfo.getTimeCycle());
-            leaser.heartBeatRenew();
+            Leaser<RegisteredInstanceInfo> leaser = createLeaser(registeredInstanceInfo);
             serverInstance.put(registeredInstanceInfo.getInstanceId(),leaser);
             registers.put(registeredInstanceInfo.getHostname(),serverInstance);
+        }else {
+            if (serverInstance.get(registeredInstanceInfo.getInstanceId())==null){
+                Leaser<RegisteredInstanceInfo> leaser = createLeaser(registeredInstanceInfo);
+                serverInstance.put(registeredInstanceInfo.getInstanceId(),leaser);
+            }
         }
         System.out.println("服务注册: " + registeredInstanceInfo);
     }
@@ -75,5 +76,14 @@ public class InstanceServiceRegistryDo implements ServiceRegistry {
 
         }
         System.out.println("服务剔除");
+    }
+
+    private Leaser<RegisteredInstanceInfo> createLeaser(RegisteredInstanceInfo registeredInstanceInfo) {
+        Leaser<RegisteredInstanceInfo> leaser = new Leaser<>();
+        registeredInstanceInfo.setStatusCode(StatusCode.UP);
+        leaser.setObj(registeredInstanceInfo);
+        leaser.setTimeCycle(registeredInstanceInfo.getTimeCycle());
+        leaser.heartBeatRenew();
+        return leaser;
     }
 }
