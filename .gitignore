@@ -2,8 +2,8 @@
 *.class
 *.iml
 .idea
-target/*
 target/**
+target/*
 out/*
 
 # Log file
